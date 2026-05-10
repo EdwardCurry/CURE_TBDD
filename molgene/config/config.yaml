@@ -1,0 +1,115 @@
+encoder_path: # download from hugging face https://huggingface.co/stable-diffusion-v1-5/stable-diffusion-v1-5
+real_img_path: ./data/real_img/image.jpg # replace with yours ./ -> /scTrans-Gen/molgene
+molgene_feat_info:
+  input_channels: 4
+  h: 16
+  w: 16
+  embed_dim: 256
+  num_heads: 4
+  decode_embed_dim: 250
+  decode_embed_dim_resample: 32
+# molgene_feat_info:
+#   input_channels: 1
+#   h: 128
+#   w: 128
+#   embed_dim: 256
+#   num_heads: 4
+#   decode_embed_dim: 250
+#   decode_embed_dim_resample: 32
+train:
+  stage: 1
+  num_epochs: 1000
+  batch_size: 80 # 64
+  learning_rate: 1e-4
+  train_data_path: ./data/cell_img/testImage # replace with yours
+  anneal_rate: 0.9
+  anneal_iter: 20000
+  clip_norm: 5.0
+  log_iter: 10
+  ckpt_load: ./ckpt/2025-05-19_09-50-24/epoch_56_.pth # replace with yours
+valid:
+  valid_data_path: ./data/cell_img/testImage
+ckpt_path: ./ckpt
+log_path: ./log
+drug_metadata_path: ./data/drug_metadata.parquet
+
+hgraph:
+  ckpt_path: ../Graph_VAE/ckpt/model.ckpt 
+  vocab: ../Graph_VAE/data/my_smiles/vocab_test.txt 
+
+data_load:
+  INPUT_DIR: # replace with CVCL h5ad files
+  # Output directory for CSV files (can be the same or different)
+  OUTPUT_DIR: './' # Save to current directory, change if needed
+  LOG_FILE: pseudo_cell_generation.log # File to log errors and progress
+  # Parameters for pseudo-cell generation
+  TOTAL_PSEUDO_CELLS: 128
+  N_CELLS_PER_PSEUDO: 15
+  NUM_REPETITIONS: 1 # Number of times to repeat the generation for each file
+vocab: ../Graph_VAE/data/l1000/test.txt
+
+yes_smiles:
+  use: False  # True
+  path: ./yes_smiles/yes_smiles.txt
+
+unit_train:
+  vocab: ../Graph_VAE/data/l1000/test.txt
+  rnn_type: LSTM
+  embed_size: 250
+  hidden_size: 250
+  latent_size: 32
+  diterT: 1
+  diterG: 3
+  dropout: 0.0
+  ckpt_path_unit: ./ckpt_path_l1000_hgraph
+  num_epochs: 1000
+  batch_size: 64 # 
+  learning_rate: 1e-4
+  anneal_rate: 0.9
+  anneal_iter: 10000
+  clip_norm: 5.0
+  log_iter: 10
+  train_data_path: 
+  print_iter: 300
+  classfy_hidden_dim: 320
+  depthT: 15
+  depthG: 15
+
+unit_3_train:
+  vocab: ../Graph_VAE/data/l1000/test.txt  
+  rnn_type: LSTM
+  embed_size: 250
+  hidden_size: 250
+  latent_size: 32
+  diterT: 1
+  diterG: 3
+  dropout: 0.0
+  ckpt_path_unit: ./l1000_hgraph # save path
+  num_epochs: 5000
+  batch_size: 32 # 
+  learning_rate: 1e-4
+  anneal_rate: 0.9
+  anneal_iter: 10000
+  clip_norm: 5.0
+  log_iter: 10
+  train_data_path: 
+  print_iter: 300
+  classfy_hidden_dim: 320
+  depthT: 15
+  depthG: 15
+  all_smiles_path: ./data/t_v_smiles/all.txt
+  t_smiles_path: ./data/t_v_smiles/t_data.txt
+  v_smiles_path: ./data/t_v_smiles/v_data.txt
+  val_iter: 1000
+  if_mse: True
+  if_vec_kl: False
+  T: 0.5
+  molgene_3_kl_net:
+    is_use: True
+    org_kl_loss: True
+  weight_decay: 1e-3
+  is_frozen: True
+  log_interval: 10
+  log_epoch: 5
+  cp_path: ../DiT/data/feat/level3_landmark_ctp_cp_amp_33567.csv
+  ctl_path: ../DiT/data/feat/level3_landmark_ctp_ctl_amp_33567.csv
